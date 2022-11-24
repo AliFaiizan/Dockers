@@ -16,14 +16,9 @@ const pgClient = new Pool({
   host: keys.pgHost,
   database: keys.pgDatabase,
   password: keys.pgPassword,
-  port: keys.pgPort,
+  port: 5432,
 });
 
-pgClient.on('connect', () => {
-  pgClient
-    .query('CREATE TABLE IF NOT EXISTS values (number INT)')
-    .catch((err) => console.log(err));
-});
 
 // Redis Client Setup
 const redis = require('redis');
@@ -68,4 +63,10 @@ app.post('/values', async (req, res) => {
 
 app.listen(5000, (err) => {
   console.log('Listening');
+  pgClient.connect(() => {
+    console.log('Connected to Postgres');
+    pgClient
+    .query('CREATE TABLE IF NOT EXISTS values (number INT)')
+    .catch((err) => console.log(err));
+    });
 });
