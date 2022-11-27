@@ -3,7 +3,21 @@ services:
   - docker
 
 before_install:
-  - docker build -t alifaiizan/4-multiple -f ./client/Dockerfile.dev ./client
+  - docker build -t alifaiizan/multi -f ./client/Dockerfile.dev ./client
 
 script:
-  - 
+  - docker urn alifaiizan/multi npm run test -- --coverage
+
+after_success:
+  - docker build -t alifaiizan/multi-client ./client
+  - docker build -t alifaiizan/multi-nginx ./nginx
+  - docker build -t alifaiizan/multi-server ./server
+  - docker build -t alifaiizan/multi-worker ./worker
+  # Log in to the docker CLI
+  # setting up encrypted variables in travis
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker push alifaiizan/multi-client
+  - docker push alifaiizan/multi-nginx
+  - docker push alifaiizan/multi-server
+  - docker push alifaiizan/multi-worker
+  
